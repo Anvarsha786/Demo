@@ -1,0 +1,30 @@
+pipeline {
+    agent any
+    
+    tools {
+        maven 'mymaven'
+    }
+    
+    stages {
+        stage('Verify Maven') {
+            steps {
+                sh 'mvn -version'
+            }
+        }
+        
+        stage('Build & Test') {
+            steps {
+                git branch: 'main', url: 'git@github.com:Anvarsha786/Demo.git'
+                sh 'mvn clean test'
+            }
+            post {
+                success {
+                    slackSend channel: 'jenkins--demo', message: '✅ Build completed successfully'
+                }
+                failure {
+                    slackSend channel: 'jenkins--demo', message: '❌ Build failed. Check Jenkins logs for details.'
+                }
+            }
+        }
+    }
+}
